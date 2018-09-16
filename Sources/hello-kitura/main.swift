@@ -10,15 +10,20 @@ struct Pokemon: Codable {
 
 // Create a new router
 let router = Router()
+router.post(middleware: BodyParser())
 
-router.get("pokemon/:name") { request, response, next in
+router.post("pokemonFE") { request, response, next in
   
-  guard let name = request.parameters["name"] else {
-    try response.status(.badRequest).end()
-    return
+  guard let body = request.body,
+        let values = body.asURLEncoded,
+        let name = values["name"]
+    else {
+      try response.status(.badRequest).end()
+      return
   }
   
-  response.send("The Pokemon name is \(name)")
+  response.send(name)
+  next()
 }
 
 // Add an HTTP server and connect it to the router
